@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluación Docente de Zazarabicoa — Registro y Control de Evaluación</title>
+<link rel="stylesheet" href="css/estilos.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230b4d2c'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23d4af37' font-family='Georgia'%3EZ%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ═══════════════════════ PANTALLA DE ACCESO ═════════════════════════════ -->
+<div class="pantalla-acceso" id="pantalla-acceso">
+  <div class="acceso-caja">
+    <div class="acceso-cabecera">
+      <div class="acceso-escudo" id="acceso-escudo"></div>
+      <div class="acceso-titulos">
+        <p class="mini-oficial">República Bolivariana de Venezuela &middot; Ministerio del Poder Popular para la Educación</p>
+        <h1 id="acceso-titulo">Evaluación Docente de Zazarabicoa</h1>
+        <p class="subtitulo" id="acceso-subtitulo"></p>
+      </div>
+    </div>
+
+    <div class="acceso-paso" id="acceso-paso-clave">
+      <h2>Paso 1 · Clave de acceso de la institución</h2>
+      <p class="ayuda">Solicite la clave a la coordinación de evaluación del plantel.</p>
+      <div class="fila-entrada">
+        <input type="password" id="acceso-clave" placeholder="Escriba la clave de acceso" autocomplete="off">
+        <button class="btn btn-primario" id="btn-acceso-clave" type="button">Entrar</button>
+      </div>
+      <p class="aviso-item error" id="acceso-clave-error" hidden></p>
+    </div>
+
+    <div class="acceso-paso" id="acceso-paso-usuario" hidden>
+      <h2>Paso 2 · ¿Quién va a trabajar?</h2>
+      <p class="ayuda" id="acceso-modo-texto"></p>
+
+      <div id="acceso-local">
+        <div class="lista-usuarios" id="acceso-usuarios-lista"></div>
+        <div class="acceso-crear">
+          <h3>Crear mi usuario de docente</h3>
+          <p class="ayuda">Cada docente tiene sus propios datos: su nómina, sus asignaturas, sus planes y sus notas. Nada se mezcla con los demás.</p>
+          <div class="rejilla-campos">
+            <label class="campo campo-ancho"><span>Nombre y apellido del docente</span>
+              <input type="text" id="acceso-nombre" placeholder="Ej.: Miguel Ángel Pérez" autocomplete="off">
+            </label>
+            <label class="campo"><span>Contraseña</span>
+              <input type="password" id="acceso-nueva-clave" placeholder="Mínimo 4 caracteres" autocomplete="off">
+            </label>
+            <label class="campo"><span>Repetir contraseña</span>
+              <input type="password" id="acceso-nueva-clave2" placeholder="Repita la contraseña" autocomplete="off">
+            </label>
+          </div>
+          <div class="fila-botones">
+            <button class="btn btn-exito" id="btn-crear-usuario" type="button">✔️ Crear mi usuario y entrar</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="acceso-nube" hidden>
+        <div class="rejilla-campos">
+          <label class="campo"><span>Correo electrónico</span>
+            <input type="email" id="acceso-correo" placeholder="docente@correo.com" autocomplete="off">
+          </label>
+          <label class="campo"><span>Contraseña</span>
+            <input type="password" id="acceso-correo-clave" placeholder="Mínimo 6 caracteres" autocomplete="off">
+          </label>
+        </div>
+        <div class="fila-botones">
+          <button class="btn btn-primario" id="btn-nube-entrar" type="button">Ingresar</button>
+          <button class="btn btn-exito" id="btn-nube-crear" type="button">Crear cuenta nueva</button>
+        </div>
+        <p class="ayuda">Sus datos quedan guardados en internet (Firebase de Google) y puede entrar desde cualquier computadora o teléfono.</p>
+      </div>
+
+      <div class="avisos" id="acceso-avisos"></div>
+      <div class="fila-botones">
+        <button class="btn btn-claro" id="btn-acceso-volver" type="button">← Volver a la clave de acceso</button>
+      </div>
+    </div>
+
+    <p class="acceso-pie"><span id="acceso-modo-chip"></span></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ ENCABEZADO ══════════════════════════════ -->
+<header class="cabecera-app">
+  <div class="cabecera-izq">
+    <div class="escudo-caja" id="escudo-app" title="Escudo institucional de Zazarabicoa"></div>
+    <div class="cabecera-titulos">
+      <p class="mini-oficial">República Bolivariana de Venezuela &middot; Ministerio del Poder Popular para la Educación</p>
+      <h1>Evaluación Docente de Zazarabicoa</h1>
+      <p class="subtitulo" id="cabecera-contexto">Complejo Educativo "Zazarabicoa" &middot; Fundado en 1946</p>
+    </div>
+  </div>
+  <div class="cabecera-der">
+    <div class="chips-cabecera">
+      <div class="chip-estado" id="chip-guardado" title="Estado del guardado automático">
+        <span class="punto-verde"></span> Guardado automático activo
+      </div>
+      <div class="chip-estado chip-nube" id="chip-nube" hidden title="Estado de la sincronización en la nube">
+        ☁️ Conectando…
+      </div>
+    </div>
+    <div class="botones-cabecera">
+      <button class="btn btn-claro" id="btn-respaldo-rapido" type="button">💾 Descargar respaldo</button>
+      <button class="btn btn-claro" id="btn-imprimir-rapido" type="button">🖨️ Imprimir vista</button>
+      <button class="btn btn-claro" id="btn-cambiar-docente" type="button">👤 Cambiar de docente</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════ NAVEGACIÓN PRINCIPAL ════════════════════════ -->
+<nav class="pestanas" id="pestanas" role="tablist">
+  <button class="pestana activa" data-vista="configuracion" type="button"><b>1</b> ⚙️ Configuración</button>
+  <button class="pestana" data-vista="nomina" type="button"><b>2</b> 👥 Nómina de estudiantes</button>
+  <button class="pestana" data-vista="plan" type="button"><b>3</b> 📋 Plan de evaluación</button>
+  <button class="pestana" data-vista="continua" type="button"><b>4</b> 📝 Evaluación continua y definitiva</button>
+  <button class="pestana" data-vista="sabana" type="button"><b>5</b> 📈 Sábana definitiva anual</button>
+  <button class="pestana" data-vista="respaldo" type="button"><b>6</b> 💾 Guardado y respaldo</button>
+</nav>
+
+<main id="contenido">
+
+  <!-- ═════════════════════════ 1. CONFIGURACIÓN ═══════════════════════════ -->
+  <section class="vista activa" id="vista-configuracion">
+    <div class="rejilla-2">
+      <!-- Docente -->
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">👩‍🏫 Datos del Docente Evaluador</h2>
+        <div class="rejilla-campos">
+          <label class="campo"><span>Nombres</span>
+            <input type="text" id="doc-nombres" placeholder="Ej.: María Alejandra" autocomplete="off">
+          </label>
+          <label class="campo"><span>Apellidos</span>
+            <input type="text" id="doc-apellidos" placeholder="Ej.: Rodríguez Pérez" autocomplete="off">
+          </label>
+          <label class="campo campo-corto"><span>Cédula de Identidad</span>
+            <span class="grupo-entrada">
+              <select id="doc-cedula-tipo" aria-label="Tipo de cédula">
+                <option value="V">V-</option>
+                <option value="E">E-</option>
+                <option value="J">J-</option>
+                <option value="P">P-</option>
+              </select>
+              <input type="text" id="doc-cedula" placeholder="12.345.678" autocomplete="off" inputmode="numeric">
+            </span>
+          </label>
+          <label class="campo"><span>Teléfono</span>
+            <input type="text" id="doc-telefono" placeholder="0414-1234567" autocomplete="off">
+          </label>
+          <label class="campo"><span>Correo electrónico</span>
+            <input type="email" id="doc-correo" placeholder="docente@correo.com" autocomplete="off">
+          </label>
+          <label class="campo campo-ancho"><span>Área donde se desempeña</span>
+            <input type="text" id="doc-area" list="lista-areas" placeholder="Elija una de las asignaturas de la institución o escriba su área" autocomplete="off">
+            <datalist id="lista-areas"></datalist>
+          </label>
+        </div>
+      </div>
+
+      <!-- Institución -->
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">🏫 Datos de la Institución</h2>
+        <div class="rejilla-campos">
+          <label class="campo campo-ancho"><span>Nombre del plantel</span>
+            <input type="text" id="inst-nombre" value="Complejo Educativo &quot;Zazarabicoa&quot;" autocomplete="off">
+          </label>
+          <label class="campo"><span>Año de fundación</span>
+            <input type="text" id="inst-fundado" value="1946" autocomplete="off">
+          </label>
+          <label class="campo"><span>Código DEA</span>
+            <input type="text" id="inst-dea" value="S4375D1305" autocomplete="off">
+          </label>
+          <label class="campo"><span>Circuito escolar</span>
+            <input type="text" id="inst-circuito" value="José Morales &quot;Cachimba&quot;" autocomplete="off">
+          </label>
+          <label class="campo"><span>Municipio</span>
+            <input type="text" id="inst-municipio" value="Morán" autocomplete="off">
+          </label>
+          <label class="campo"><span>Estado</span>
+            <input type="text" id="inst-estado" value="Lara" autocomplete="off">
+          </label>
+          <label class="campo"><span>Año escolar</span>
+            <input type="text" id="inst-anio" value="2024-2025" autocomplete="off">
+          </label>
+          <label class="campo"><span>Director(a) del plantel</span>
+            <input type="text" id="inst-director" value="Rosana Rodríguez" autocomplete="off">
+          </label>
+          <label class="campo"><span>Coordinador(a) de Evaluación 1</span>
+            <input type="text" id="inst-coordinador" value="Rocío García" autocomplete="off">
+          </label>
+          <label class="campo"><span>Coordinador(a) de Evaluación 2</span>
+            <input type="text" id="inst-coordinador2" value="Eli Torrealba" autocomplete="off">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="rejilla-3">
+      <!-- Años -->
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">🎓 Años que atiende</h2>
+        <p class="ayuda">Educación Media General. Seleccione uno o varios años.</p>
+        <div class="grupo-opciones" id="grupo-anios"></div>
+      </div>
+
+      <!-- Secciones -->
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">🔤 Secciones</h2>
+        <p class="ayuda">Seleccione las secciones que atiende y agregue otras si las necesita.</p>
+        <div class="grupo-opciones" id="grupo-secciones"></div>
+        <div class="fila-entrada">
+          <input type="text" id="seccion-nueva" placeholder="Ej.: E" maxlength="12" autocomplete="off">
+          <button class="btn btn-primario" id="btn-agregar-seccion" type="button">Agregar</button>
+        </div>
+      </div>
+
+      <!-- Ajustes -->
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">⚖️ Ajustes de evaluación</h2>
+        <div class="rejilla-campos">
+          <label class="campo"><span>Nota mínima aprobatoria</span>
+            <input type="number" id="aj-minima" min="1" max="20" step="1">
+          </label>
+          <label class="campo"><span>Umbral de redondeo</span>
+            <input type="number" id="aj-umbral" min="0" max="0.99" step="0.01">
+          </label>
+          <label class="campo campo-ancho"><span>Criterio de redondeo oficial</span>
+            <select id="aj-modo"></select>
+          </label>
+          <label class="campo"><span>Derecho a revisión desde</span>
+            <input type="number" id="aj-revision" min="1" max="20" step="0.5">
+          </label>
+          <label class="campo"><span>Escala máxima</span>
+            <input type="number" id="aj-escala" min="1" max="20" step="1">
+          </label>
+        </div>
+        <p class="ayuda" id="ayuda-redondeo"></p>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📚 Asignaturas que imparte</h2>
+      <p class="ayuda">Marque todas las asignaturas oficiales que dicta. Puede agregar otras (C.R.P., Arte y Patrimonio, etc.).</p>
+      <div class="grupo-opciones grupo-ancho" id="grupo-asignaturas"></div>
+      <div class="fila-entrada">
+        <input type="text" id="asignatura-nueva" placeholder="Ej.: C.R.P. (Cátedra Bolivariana) o Arte y Patrimonio" autocomplete="off">
+        <button class="btn btn-primario" id="btn-agregar-asignatura" type="button">Agregar asignatura</button>
+        <button class="btn btn-claro" id="btn-marcar-oficiales" type="button">Marcar todas las oficiales</button>
+      </div>
+      <div class="lista-etiquetas" id="lista-asignaturas-elegidas"></div>
+    </div>
+
+    <div class="barra-acciones">
+      <button class="btn btn-primario btn-grande" id="btn-guardar-config" type="button">✔️ Guardar configuración</button>
+      <button class="btn btn-claro" id="btn-imprimir-config" type="button">🖨️ Imprimir constancia de datos</button>
+      <button class="btn btn-claro" id="btn-excel-config" type="button">📊 Exportar configuración a Excel (.xlsx)</button>
+      <span class="mensaje-inline" id="msg-config"></span>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════ 2. NÓMINA ═════════════════════════════════ -->
+  <section class="vista" id="vista-nomina">
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">👥 Nómina de estudiantes</h2>
+      <div class="barra-selectores">
+        <label class="campo campo-corto"><span>Año</span><select id="nom-anio"></select></label>
+        <label class="campo campo-corto"><span>Sección</span><select id="nom-seccion"></select></label>
+        <div class="info-matricula" id="nom-info"></div>
+      </div>
+      <div class="fila-botones">
+        <button class="btn btn-primario" id="btn-agregar-estudiante" type="button">➕ Agregar estudiante</button>
+        <button class="btn btn-claro" id="btn-borrar-seleccion" type="button">🗑️ Borrar seleccionados</button>
+        <button class="btn btn-claro" id="btn-ordenar-nomina" type="button">🔤 Ordenar alfabéticamente</button>
+        <button class="btn btn-claro" id="btn-imprimir-nomina" type="button">🖨️ Imprimir nómina</button>
+        <button class="btn btn-claro" id="btn-excel-nomina" type="button">📊 Exportar a Excel (.xlsx)</button>
+      </div>
+      <div class="contenedor-tabla">
+        <table class="tabla tabla-nomina" id="tabla-nomina">
+          <thead>
+            <tr>
+              <th class="col-check"><input type="checkbox" id="nom-check-todos" title="Seleccionar todos"></th>
+              <th class="col-num">N°</th>
+              <th>Cédula</th><th>Apellidos</th><th>Nombres</th>
+              <th>Año</th><th>Sección</th><th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-nomina"></tbody>
+        </table>
+      </div>
+      <div class="pie-tabla" id="pie-nomina"></div>
+    </div>
+
+    <div class="tarjeta tarjeta-destacada">
+      <h2 class="titulo-tarjeta">⚡ Carga masiva (copiar y pegar desde Excel o Word)</h2>
+      <p class="ayuda">Pegue la lista completa con el formato <b>Cédula · Apellidos · Nombres</b>. Acepta columnas separadas por tabulación (Excel), punto y coma, coma, doble espacio o texto corrido; si la lista trae una columna de sexo, se ignora. Se ignoran los encabezados. No es necesario tipear uno a uno.</p>
+      <textarea id="masiva-texto" rows="7" placeholder="V-12345678&#9;Pérez Gómez&#9;Juan Carlos&#10;E-8123456&#9;Rodríguez&#9;Ana María&#10;V-20123456; Salazar Rivas; Luis Alberto"></textarea>
+      <div class="fila-botones">
+        <button class="btn btn-primario" id="btn-analizar-masiva" type="button">🔍 Analizar lista</button>
+        <label class="campo campo-corto"><span>Año destino</span><select id="masiva-anio"></select></label>
+        <label class="campo campo-corto"><span>Sección destino</span><select id="masiva-seccion"></select></label>
+        <button class="btn btn-exito" id="btn-confirmar-masiva" type="button" disabled>✔️ Cargar en la nómina</button>
+        <button class="btn btn-claro" id="btn-limpiar-masiva" type="button">Limpiar</button>
+      </div>
+      <div class="avisos" id="masiva-avisos"></div>
+      <div class="contenedor-tabla" id="masiva-caja-preview" hidden>
+        <p class="ayuda">Revise y corrija los datos antes de cargarlos (todo es editable):</p>
+        <table class="tabla" id="tabla-masiva">
+          <thead><tr><th class="col-num">N°</th><th>Cédula</th><th>Apellidos</th><th>Nombres</th><th class="col-acciones">Quitar</th></tr></thead>
+          <tbody id="cuerpo-masiva"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════ 3. PLAN DE EVALUACIÓN ═════════════════════ -->
+  <section class="vista" id="vista-plan">
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📋 Plan de evaluación por lapso</h2>
+      <div class="barra-selectores">
+        <label class="campo campo-corto"><span>Año</span><select id="plan-anio"></select></label>
+        <label class="campo campo-corto"><span>Sección</span><select id="plan-seccion"></select></label>
+        <label class="campo"><span>Asignatura</span><select id="plan-asignatura"></select></label>
+        <label class="campo campo-corto"><span>Momento / Lapso</span><select id="plan-lapso"></select></label>
+      </div>
+      <div class="fila-botones">
+        <button class="btn btn-primario" id="btn-plan-agregar" type="button">➕ Agregar actividad evaluativa</button>
+        <button class="btn btn-claro" id="btn-plan-repartir" type="button">⚖️ Repartir 100 % en partes iguales</button>
+        <button class="btn btn-claro" id="btn-plan-completar" type="button">🎯 Completar hasta 100 %</button>
+        <button class="btn btn-claro" id="btn-plan-copiar" type="button">📄 Copiar plan de otro lapso</button>
+        <button class="btn btn-peligro" id="btn-plan-limpiar" type="button">🗑️ Vaciar plan</button>
+        <button class="btn btn-claro" id="btn-imprimir-plan" type="button">🖨️ Imprimir plan (PDF)</button>
+        <button class="btn btn-claro" id="btn-excel-plan" type="button">📊 Exportar a Excel (.xlsx)</button>
+      </div>
+
+      <div class="medidor-ponderacion" id="plan-medidor">
+        <div class="medidor-texto"><span id="plan-total-texto">0,00 %</span><span id="plan-total-detalle"></span></div>
+        <div class="barra-progreso"><div class="relleno" id="plan-total-barra"></div></div>
+        <p class="medidor-mensaje" id="plan-total-mensaje"></p>
+      </div>
+
+      <div class="contenedor-tabla">
+        <table class="tabla tabla-plan" id="tabla-plan">
+          <thead>
+            <tr>
+              <th class="col-num">N°</th>
+              <th style="min-width:190px">Actividad evaluativa</th>
+              <th style="min-width:150px">Tipo</th>
+              <th style="min-width:240px">Contenido programático / referente teórico-práctico</th>
+              <th style="min-width:150px">Técnica / estrategia</th>
+              <th style="min-width:160px">Instrumento</th>
+              <th class="col-ponderacion">Ponderación %</th>
+              <th class="col-puntos">Puntos</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-plan"></tbody>
+        </table>
+      </div>
+      <div class="pie-tabla" id="pie-plan"></div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════ 4. EVALUACIÓN CONTINUA ════════════════════════ -->
+  <section class="vista" id="vista-continua">
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📝 Registro de evaluación continua y definitiva del lapso</h2>
+      <div class="barra-selectores">
+        <label class="campo campo-corto"><span>Año</span><select id="ec-anio"></select></label>
+        <label class="campo campo-corto"><span>Sección</span><select id="ec-seccion"></select></label>
+        <label class="campo"><span>Asignatura</span><select id="ec-asignatura"></select></label>
+        <label class="campo campo-corto"><span>Momento / Lapso</span><select id="ec-lapso"></select></label>
+      </div>
+      <div class="mensaje-aviso" id="ec-aviso-plan"></div>
+    </div>
+
+    <div class="tarjeta tarjeta-destacada">
+      <h2 class="titulo-tarjeta">⚖️ Ponderación de las evaluaciones <span class="insignia-editable">modificable por el docente</span></h2>
+      <p class="ayuda">El docente define aquí el peso de cada evaluación. La suma debe alcanzar exactamente <b>100 %</b>, lo que equivale a <b>20 puntos</b> de la escala vigesimal. Todo cambio se refleja de inmediato en la matriz y en el plan de evaluación.</p>
+      <div class="contenedor-tabla">
+        <table class="tabla tabla-ponderacion" id="tabla-ponderacion">
+          <thead>
+            <tr>
+              <th class="col-num">N°</th>
+              <th style="min-width:200px">Evaluación</th>
+              <th style="min-width:140px">Tipo</th>
+              <th class="col-ponderacion">Ponderación %</th>
+              <th class="col-puntos">Equivale a</th>
+              <th class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-ponderacion"></tbody>
+        </table>
+      </div>
+      <div class="fila-botones">
+        <button class="btn btn-primario" id="btn-ec-agregar" type="button">➕ Agregar evaluación</button>
+        <button class="btn btn-claro" id="btn-ec-repartir" type="button">⚖️ Repartir 100 % en partes iguales</button>
+        <button class="btn btn-claro" id="btn-ec-completar" type="button">🎯 Completar hasta 100 %</button>
+        <button class="btn btn-claro" id="btn-ec-copiar-plan" type="button">📋 Traer actividades del plan de evaluación</button>
+      </div>
+      <div class="medidor-ponderacion" id="ec-medidor">
+        <div class="medidor-texto"><span id="ec-total-texto">0,00 %</span><span id="ec-total-detalle"></span></div>
+        <div class="barra-progreso"><div class="relleno" id="ec-total-barra"></div></div>
+        <p class="medidor-mensaje" id="ec-total-mensaje"></p>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">🧮 Matriz de calificaciones (escala vigesimal 01 – 20)</h2>
+      <div class="fila-botones">
+        <span class="chip-info" id="ec-chip-notas">0 de 0 notas registradas</span>
+        <button class="btn btn-claro" id="btn-ec-llenar" type="button">🖊️ Llenar columna vacía</button>
+        <button class="btn btn-peligro" id="btn-ec-limpiar-notas" type="button">🧹 Borrar todas las notas</button>
+        <button class="btn btn-claro" id="btn-ec-ordenar" type="button">🔤 Ordenar por apellidos</button>
+        <button class="btn btn-claro" id="btn-ec-imprimir" type="button">🖨️ Imprimir (PDF)</button>
+        <button class="btn btn-claro" id="btn-ec-excel" type="button">📊 Exportar a Excel (.xlsx)</button>
+      </div>
+      <div class="contenedor-tabla contenedor-ancho">
+        <table class="tabla tabla-notas" id="tabla-notas">
+          <thead id="cabeza-notas"></thead>
+          <tbody id="cuerpo-notas"></tbody>
+          <tfoot id="pie-notas"></tfoot>
+        </table>
+      </div>
+      <p class="ayuda">Puntos acumulados = Σ (nota × % ÷ 100). La <b>nota definitiva del lapso</b> se obtiene aplicando el criterio de redondeo oficial configurado. Condición: <b class="verde">APROBADO</b> ≥ nota mínima, <b class="rojo">REPROBADO</b> por debajo.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📊 Estadísticas oficiales del lapso</h2>
+      <div class="rejilla-estadisticas" id="ec-estadisticas"></div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════ 5. SÁBANA ANUAL ═══════════════════════════════ -->
+  <section class="vista" id="vista-sabana">
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📈 Sábana definitiva anual (consolidado de los 3 lapsos)</h2>
+      <div class="barra-selectores">
+        <label class="campo campo-corto"><span>Año</span><select id="sab-anio"></select></label>
+        <label class="campo campo-corto"><span>Sección</span><select id="sab-seccion"></select></label>
+        <label class="campo"><span>Asignatura</span><select id="sab-asignatura"></select></label>
+      </div>
+      <div class="fila-botones">
+        <button class="btn btn-claro" id="btn-sab-ordenar" type="button">🔤 Ordenar por apellidos</button>
+        <button class="btn btn-claro" id="btn-sab-ordenar-nota" type="button">🔢 Ordenar por nota</button>
+        <button class="btn btn-claro" id="btn-sab-imprimir" type="button">🖨️ Imprimir sábana (PDF)</button>
+        <button class="btn btn-claro" id="btn-sab-excel" type="button">📊 Exportar a Excel (.xlsx)</button>
+        <button class="btn btn-claro" id="btn-sab-todo-excel" type="button">📚 Exportar libro completo a Excel (.xlsx)</button>
+      </div>
+      <div class="contenedor-tabla contenedor-ancho">
+        <table class="tabla tabla-sabana" id="tabla-sabana">
+          <thead id="cabeza-sabana"></thead>
+          <tbody id="cuerpo-sabana"></tbody>
+          <tfoot id="pie-sabana"></tfoot>
+        </table>
+      </div>
+      <p class="ayuda">Promedio anual = media de las calificaciones definitivas de los 3 lapsos. La calificación definitiva final aplica el criterio de redondeo oficial configurado. <b>DERECHO A REVISIÓN</b> se marca cuando el promedio anual queda entre <span id="sab-revision-texto">9,00</span> y la nota mínima aprobatoria.</p>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📚 Resumen general por asignatura</h2>
+      <p class="ayuda">Promedio anual de cada estudiante en todas las asignaturas que imparte, con su calificación definitiva final y condición.</p>
+      <div class="contenedor-tabla contenedor-ancho">
+        <table class="tabla" id="tabla-resumen-general">
+          <thead id="cabeza-resumen"></thead>
+          <tbody id="cuerpo-resumen"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">📊 Estadísticas finales del curso</h2>
+      <div class="rejilla-estadisticas" id="sab-estadisticas"></div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════ 6. RESPALDO ═══════════════════════════════════ -->
+  <section class="vista" id="vista-respaldo">
+    <div class="rejilla-2">
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">💾 Guardado permanente</h2>
+        <p class="ayuda">Todos los datos se guardan automáticamente en este navegador (almacenamiento local). Aun así, descargue respaldos con frecuencia para llevarlos en un pendrive o pasarlos a otra computadora.</p>
+        <dl class="lista-datos" id="resumen-datos"></dl>
+        <div class="fila-botones">
+          <button class="btn btn-primario" id="btn-descargar-json" type="button">⬇️ Descargar respaldo (.json)</button>
+          <button class="btn btn-claro" id="btn-guardar-copia" type="button">📌 Guardar copia interna</button>
+        </div>
+      </div>
+
+      <div class="tarjeta" id="tarjeta-nube">
+        <h2 class="titulo-tarjeta">☁️ Nube (Firebase de Google)</h2>
+        <div id="nube-detalle"></div>
+        <div class="fila-botones">
+          <button class="btn btn-claro" id="btn-nube-sincronizar" type="button">🔄 Sincronizar ahora</button>
+          <button class="btn btn-claro" id="btn-nube-subir" type="button">⬆️ Subir todos mis datos a la nube</button>
+        </div>
+      </div>
+
+      <div class="tarjeta">
+        <h2 class="titulo-tarjeta">♻️ Restaurar</h2>
+        <p class="ayuda">Recupere cualquier respaldo <b>.json</b> descargado previamente. Se reemplazarán los datos actuales (se le pedirá confirmación).</p>
+        <label class="btn btn-primario btn-archivo">📂 Seleccionar archivo de respaldo
+          <input type="file" id="archivo-restaurar" accept=".json,application/json" hidden>
+        </label>
+        <div class="fila-botones">
+          <button class="btn btn-claro" id="btn-exportar-todo" type="button">📊 Exportar todo a Excel (.xlsx)</button>
+          <button class="btn btn-peligro" id="btn-borrar-todo" type="button">🗑️ Borrar todos los datos</button>
+        </div>
+        <div class="avisos" id="avisos-respaldo"></div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h2 class="titulo-tarjeta">🗂️ Copias internas guardadas en este navegador</h2>
+      <p class="ayuda">Copias rápidas con fecha y hora. Restaurar una copia reemplaza los datos actuales.</p>
+      <div class="contenedor-tabla">
+        <table class="tabla">
+          <thead><tr><th class="col-num">N°</th><th>Fecha y hora</th><th>Descripción</th><th>Contenido</th><th class="col-acciones">Acciones</th></tr></thead>
+          <tbody id="cuerpo-copias"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie-app">
+  <span id="pie-modo">Evaluación Docente de Zazarabicoa</span>
+  <span id="pie-version"></span>
+</footer>
+
+<!-- Tarjetas flotantes -->
+<div class="avisos-flotantes" id="avisos-flotantes" aria-live="polite"></div>
+
+<div class="fondo-modal" id="fondo-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <h3 id="modal-titulo">Confirmación</h3>
+    <p id="modal-texto"></p>
+    <div class="modal-pie">
+      <button class="btn btn-claro" id="modal-cancelar" type="button">Cancelar</button>
+      <button class="btn btn-primario" id="modal-aceptar" type="button">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Área exclusiva de impresión / PDF -->
+<div id="area-impresion" aria-hidden="true"></div>
+
+<script src="js/config-acceso.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/nucleo.js"></script>
+<script src="js/escudo.js"></script>
+<script src="js/escudo-real.js"></script>
+<script src="js/almacen.js"></script>
+<script src="js/nube.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/xlsx.js"></script>
+<script src="js/exportacion.js"></script>
+<script src="js/configuracion.js"></script>
+<script src="js/estudiantes.js"></script>
+<script src="js/plan.js"></script>
+<script src="js/continua.js"></script>
+<script src="js/sabana.js"></script>
+<script src="js/respaldo.js"></script>
+<script src="js/acceso.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

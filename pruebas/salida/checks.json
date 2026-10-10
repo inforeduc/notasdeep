@@ -1,0 +1,46 @@
+{
+  "format": "xlsx",
+  "verdict": "pass",
+  "checks": [
+    {
+      "id": "package",
+      "status": "pass"
+    },
+    {
+      "id": "count",
+      "status": "pass",
+      "expected": 5,
+      "actual": 5
+    }
+  ],
+  "summary": {
+    "sheets": [
+      {
+        "name": "Configuraci\u00f3n",
+        "cells": 65,
+        "formulas": 0
+      },
+      {
+        "name": "N\u00f3mina 1A",
+        "cells": 42,
+        "formulas": 0
+      },
+      {
+        "name": "Lapso 1",
+        "cells": 65,
+        "formulas": 0
+      },
+      {
+        "name": "S\u00e1bana 1\u00b0 A",
+        "cells": 62,
+        "formulas": 0
+      },
+      {
+        "name": "Resumen general 1A",
+        "cells": 62,
+        "formulas": 0
+      }
+    ],
+    "formulas_evaluated": false
+  }
+}
